@@ -1,13 +1,13 @@
-package io.github.ikajdan.sixthsense.ui.notifications
+package io.github.ikajdan.sixthsense.ui.sensors
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 
-class NotificationsViewModel : ViewModel() {
+class SensorsViewModel : ViewModel() {
 
     private val _text = MutableLiveData<String>().apply {
-        value = "This is notifications Fragment"
+        value = "This is sensors Fragment"
     }
     val text: LiveData<String> = _text
 }

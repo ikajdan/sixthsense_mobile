@@ -3,23 +3,29 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/mobile_navigation"
-    app:startDestination="@+id/navigation_home">
+    app:startDestination="@+id/navigation_sensors">
 
     <fragment
-        android:id="@+id/navigation_home"
-        android:name="io.github.ikajdan.sixthsense.ui.home.HomeFragment"
-        android:label="@string/title_home"
-        tools:layout="@layout/fragment_home" />
+        android:id="@+id/navigation_sensors"
+        android:name="io.github.ikajdan.sixthsense.ui.sensors.SensorsFragment"
+        android:label="@string/title_sensors"
+        tools:layout="@layout/fragment_sensors" />
 
     <fragment
-        android:id="@+id/navigation_dashboard"
-        android:name="io.github.ikajdan.sixthsense.ui.dashboard.DashboardFragment"
-        android:label="@string/title_dashboard"
-        tools:layout="@layout/fragment_dashboard" />
+        android:id="@+id/navigation_plots"
+        android:name="io.github.ikajdan.sixthsense.ui.plots.PlotsFragment"
+        android:label="@string/title_plots"
+        tools:layout="@layout/fragment_plots" />
 
     <fragment
-        android:id="@+id/navigation_notifications"
-        android:name="io.github.ikajdan.sixthsense.ui.notifications.NotificationsFragment"
-        android:label="@string/title_notifications"
-        tools:layout="@layout/fragment_notifications" />
+        android:id="@+id/navigation_control"
+        android:name="io.github.ikajdan.sixthsense.ui.control.ControlFragment"
+        android:label="@string/title_control"
+        tools:layout="@layout/fragment_control" />
+
+    <fragment
+        android:id="@+id/navigation_settings"
+        android:name="io.github.ikajdan.sixthsense.ui.settings.SettingsFragment"
+        android:label="@string/title_settings"
+        tools:layout="@layout/fragment_settings" />
 </navigation>
