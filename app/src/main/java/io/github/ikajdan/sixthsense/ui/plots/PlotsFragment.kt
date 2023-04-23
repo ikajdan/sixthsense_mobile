@@ -1,10 +1,13 @@
 package io.github.ikajdan.sixthsense.ui.plots
 
+import android.content.Context
 import android.os.Bundle
 import android.os.Handler
+import android.provider.Settings.Global.putString
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.content.edit
 import androidx.fragment.app.Fragment
 import com.github.aachartmodel.aainfographics.aachartcreator.*
 import com.github.aachartmodel.aainfographics.aaoptionsmodel.AAStyle
@@ -18,9 +21,8 @@ class PlotsFragment : Fragment() {
     private var _binding: FragmentPlotsBinding? = null
     private val binding get() = _binding!!
 
-    private var aaChartModel = AAChartModel()
     private var aaChartView: AAChartView? = null
-
+    private var aaChartModel = AAChartModel()
     private var temperature = arrayOfNulls<Any>(10)
     private var humidity = arrayOfNulls<Any>(10)
     private var pressure = arrayOfNulls<Any>(10)
@@ -58,10 +60,11 @@ class PlotsFragment : Fragment() {
             .yAxisGridLineWidth(0)
             .markerRadius(0)
             .xAxisVisible(false)
-            .yAxisTitle("Temperature")
+            .yAxisTitle("Temperature (°C), Humidity (%), Pressure (hPa)")
             .axesTextColor("#FFFFFF80")
             .animationType(AAChartAnimationType.EaseInOutQuint)
         aaChartModel.series(this.configureChartSeriesArray() as Array<Any>)
+
         return aaChartModel
     }
 
@@ -111,6 +114,14 @@ class PlotsFragment : Fragment() {
                 val seriesArr = configureChartSeriesArray()
                 binding!!.aaChartView?.aa_onlyRefreshTheChartDataWithChartOptionsSeriesArray(seriesArr)
 
+//                var mSharedPreferences =
+//                    requireActivity().getSharedPreferences("app", Context.MODE_PRIVATE)
+//                var samplingTime = mSharedPreferences.getString("sampling_time" , "2000")
+//                if (samplingTime == null) {
+//                    samplingTime = "1000"
+//                }
+
+                //mStartVideoHandler.postDelayed(this, samplingTime.toLong())
                 mStartVideoHandler.postDelayed(this, 1000)
             }
         }

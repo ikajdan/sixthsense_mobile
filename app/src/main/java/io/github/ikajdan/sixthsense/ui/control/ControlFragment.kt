@@ -25,7 +25,14 @@ class ControlFragment : Fragment() {
 
     // Request routine
     private fun requestRoutine() {
-        var url = "http://10.0.2.2:8080"
+        var host = "http://" + "10.0.2.2"
+        val port = ":" + "8080"
+        val reqX = "x=" + binding.ledPosXInput.text.toString()
+        val reqY = "y=" + binding.ledPosYInput.text.toString()
+        val reqColor = "c=" + binding.ledColorInput.text.toString()
+
+        var url = "$host$port/index.php?$reqX&$reqY&$reqColor".lowercase()
+
         if (url.isEmpty()) return
 
         binding.textControl.text = ""
