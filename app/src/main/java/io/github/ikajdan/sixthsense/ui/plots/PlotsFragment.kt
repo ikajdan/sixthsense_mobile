@@ -1,25 +1,29 @@
 package io.github.ikajdan.sixthsense.ui.plots
 
 import android.os.Bundle
+import android.os.Handler
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProvider
-import com.github.aachartmodel.aainfographics.aachartcreator.AAChartAnimationType
-import com.github.aachartmodel.aainfographics.aachartcreator.AAChartModel
-import com.github.aachartmodel.aainfographics.aachartcreator.AAChartType
-import com.github.aachartmodel.aainfographics.aachartcreator.AASeriesElement
+import com.github.aachartmodel.aainfographics.aachartcreator.*
+import com.github.aachartmodel.aainfographics.aaoptionsmodel.AAStyle
+import com.github.aachartmodel.aainfographics.aatools.AAGradientColor
 import io.github.ikajdan.sixthsense.databinding.FragmentPlotsBinding
+import kotlinx.coroutines.*
+import kotlin.math.cos
+import kotlin.math.sin
 
 class PlotsFragment : Fragment() {
-
     private var _binding: FragmentPlotsBinding? = null
-
-    // This property is only valid between onCreateView and
-    // onDestroyView.
     private val binding get() = _binding!!
+
+    private var aaChartModel = AAChartModel()
+    private var aaChartView: AAChartView? = null
+
+    private var temperature = arrayOfNulls<Any>(10)
+    private var humidity = arrayOfNulls<Any>(10)
+    private var pressure = arrayOfNulls<Any>(10)
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -29,27 +33,88 @@ class PlotsFragment : Fragment() {
         _binding = FragmentPlotsBinding.inflate(inflater, container, false)
         val root: View = binding.root
 
-        val aaChartView = binding.aaChartView
-        val aaChartModel : AAChartModel = AAChartModel()
-            .chartType(AAChartType.Line)
-            .backgroundColor("#00000000")
-            .colorsTheme(arrayOf("#b41c56"))
-            .yAxisGridLineWidth(0)
-            .animationDuration(0)
-            .markerRadius(3)
-            .series(arrayOf(
-                AASeriesElement()
-                    .name("Tokyo")
-                    .data(arrayOf(7.0, 6.9, 9.5, 14.5, 18.2, 21.5, 25.2, 26.5, 23.3, 18.3, 13.9, 9.6))
-            )
-        )
-        aaChartView.aa_drawChartWithChartModel(aaChartModel)
+        setUpAAChartView()
+        repeatUpdateChartData()
 
         return root
     }
 
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null
+//    override fun onDestroyView() {
+//        super.onDestroyView()
+//        _binding = null
+//    }
+
+    fun setUpAAChartView() {
+        val aaChartView = binding.aaChartView
+        aaChartModel = configureAAChartModel()
+        aaChartView?.aa_drawChartWithChartModel(aaChartModel)
+    }
+
+    private fun configureAAChartModel(): AAChartModel {
+        val aaChartModel : AAChartModel = AAChartModel()
+            .chartType(AAChartType.Line)
+            .backgroundColor("#00000000")
+            .colorsTheme(arrayOf("#b41c56", "#da215e", "#ec8dad"))
+            .yAxisGridLineWidth(0)
+            .markerRadius(0)
+            .xAxisVisible(false)
+            .yAxisTitle("Temperature")
+            .axesTextColor("#FFFFFF80")
+            .animationType(AAChartAnimationType.EaseInOutQuint)
+        aaChartModel.series(this.configureChartSeriesArray() as Array<Any>)
+        return aaChartModel
+    }
+
+    @Suppress("UNCHECKED_CAST")
+    private fun configureChartSeriesArray(): Array<AASeriesElement> {
+        var min = 10
+        var max = 25
+        var random = (Math.random() * (max - min) + min).toInt()
+        temperature += random
+        if (temperature.size > 10) {
+            temperature.drop(1)
+        }
+
+        min = 70
+        max = 95
+        random = (Math.random() * (max - min) + min).toInt()
+        humidity += random
+        if (humidity.size > 10) {
+            humidity.drop(1)
+        }
+
+        min = 1000
+        max = 1100
+        random = (Math.random() * (max - min) + min).toInt()
+        pressure += random
+        if (pressure.size > 10) {
+            pressure.drop(1)
+        }
+
+        return arrayOf(
+            AASeriesElement()
+                .name("Temperature")
+                .data(temperature as Array<Any>),
+            AASeriesElement()
+                .name("Humidity")
+                .data(humidity as Array<Any>),
+            AASeriesElement()
+                .name("Pressure")
+                .data(pressure as Array<Any>),
+        )
+    }
+
+    private fun repeatUpdateChartData() {
+        val mStartVideoHandler = Handler()
+        val mStartVideoRunnable: java.lang.Runnable = object : java.lang.Runnable {
+            override fun run() {
+                val seriesArr = configureChartSeriesArray()
+                binding!!.aaChartView?.aa_onlyRefreshTheChartDataWithChartOptionsSeriesArray(seriesArr)
+
+                mStartVideoHandler.postDelayed(this, 1000)
+            }
+        }
+
+        mStartVideoHandler.postDelayed(mStartVideoRunnable, 2000)
     }
 }

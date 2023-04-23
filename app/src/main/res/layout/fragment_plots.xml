@@ -10,9 +10,12 @@
         android:id="@+id/aa_chart_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_marginEnd="16dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
+
     </com.github.aachartmodel.aainfographics.aachartcreator.AAChartView>
+
 </androidx.constraintlayout.widget.ConstraintLayout>

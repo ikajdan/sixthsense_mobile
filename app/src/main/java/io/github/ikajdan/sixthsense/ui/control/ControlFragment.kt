@@ -4,9 +4,15 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.InputMethodManager
 import android.widget.TextView
+import androidx.core.content.ContextCompat.getSystemService
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import com.android.volley.Request
+import com.android.volley.toolbox.StringRequest
+import com.android.volley.toolbox.Volley
+import com.google.android.material.snackbar.Snackbar
 import io.github.ikajdan.sixthsense.databinding.FragmentControlBinding
 
 class ControlFragment : Fragment() {
@@ -16,6 +22,40 @@ class ControlFragment : Fragment() {
     // This property is only valid between onCreateView and
     // onDestroyView.
     private val binding get() = _binding!!
+
+    // Request routine
+    private fun requestRoutine() {
+        var url = "http://10.0.2.2:8080"
+        if (url.isEmpty()) return
+
+        binding.textControl.text = ""
+
+        // Prepend with the protocol, if necessary
+        if (!url.startsWith("https://", true) && !url.startsWith("http://", true)) {
+            url = "http://$url"
+        }
+
+        // Instantiate the RequestQueue
+        val queue = Volley.newRequestQueue(activity)
+
+        // Request a string response from the provided URL
+        val stringRequest = StringRequest(
+            Request.Method.GET, url,
+            { response ->
+                // Show the response
+                binding.textControl.text = response
+            },
+            {
+                // Display the error message
+                val msg = if (it.localizedMessage.isNullOrEmpty()) "Unknown Error" else it.localizedMessage
+                Snackbar.make(binding.root, msg, Snackbar.LENGTH_LONG)
+                    .setAnchorView(binding.requestButton).show()
+            }
+        )
+
+        // Add the request to the RequestQueue
+        queue.add(stringRequest)
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -32,6 +72,11 @@ class ControlFragment : Fragment() {
         controlViewModel.text.observe(viewLifecycleOwner) {
             textView.text = it
         }
+
+        binding.requestButton.setOnClickListener {
+            requestRoutine()
+        }
+
         return root
     }
 
