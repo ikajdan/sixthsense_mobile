@@ -4,9 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.inputmethod.InputMethodManager
 import android.widget.TextView
-import androidx.core.content.ContextCompat.getSystemService
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.android.volley.Request
@@ -25,7 +23,7 @@ class ControlFragment : Fragment() {
 
     // Request routine
     private fun requestRoutine() {
-        var host = "http://" + "10.0.2.2"
+        val host = "http://" + "10.0.2.2"
         val port = ":" + "8080"
         val reqX = "x=" + binding.ledPosXInput.text.toString()
         val reqY = "y=" + binding.ledPosYInput.text.toString()
@@ -73,7 +71,7 @@ class ControlFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         val controlViewModel =
-            ViewModelProvider(this).get(ControlViewModel::class.java)
+            ViewModelProvider(this)[ControlViewModel::class.java]
 
         _binding = FragmentControlBinding.inflate(inflater, container, false)
         val root: View = binding.root
@@ -86,8 +84,6 @@ class ControlFragment : Fragment() {
         binding.requestButton.setOnClickListener {
             requestRoutine()
         }
-
-
 
         return root
     }

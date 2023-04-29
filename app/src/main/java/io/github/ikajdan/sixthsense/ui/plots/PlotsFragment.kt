@@ -1,21 +1,20 @@
 package io.github.ikajdan.sixthsense.ui.plots
 
-import android.content.Context
 import android.os.Bundle
 import android.os.Handler
-import android.provider.Settings.Global.putString
+import android.os.Looper
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.content.edit
 import androidx.fragment.app.Fragment
+import com.android.volley.Request
+import com.android.volley.Response
+import com.android.volley.toolbox.JsonObjectRequest
+import com.android.volley.toolbox.Volley
 import com.github.aachartmodel.aainfographics.aachartcreator.*
-import com.github.aachartmodel.aainfographics.aaoptionsmodel.AAStyle
-import com.github.aachartmodel.aainfographics.aatools.AAGradientColor
 import io.github.ikajdan.sixthsense.databinding.FragmentPlotsBinding
 import kotlinx.coroutines.*
-import kotlin.math.cos
-import kotlin.math.sin
+import org.json.JSONObject
 
 class PlotsFragment : Fragment() {
     private var _binding: FragmentPlotsBinding? = null
@@ -23,9 +22,15 @@ class PlotsFragment : Fragment() {
 
     private var aaChartView: AAChartView? = null
     private var aaChartModel = AAChartModel()
-    private var temperature = arrayOfNulls<Any>(10)
-    private var humidity = arrayOfNulls<Any>(10)
-    private var pressure = arrayOfNulls<Any>(10)
+    private var temperatureAA = arrayOfNulls<Any>(10)
+    private var humidityAA = arrayOfNulls<Any>(10)
+    private var pressureAA = arrayOfNulls<Any>(10)
+
+    private val mHandler = Handler(Looper.getMainLooper())
+    private val mApiUrl = "http://10.0.2.2:8080/v1/get/?t=c&p=hpa&h=perc"
+    private val mUpdateInterval = 1000L
+
+    data class Temperature(val value: Double, val unit: String)
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -35,23 +40,72 @@ class PlotsFragment : Fragment() {
         _binding = FragmentPlotsBinding.inflate(inflater, container, false)
         val root: View = binding.root
 
-        setUpAAChartView()
-        repeatUpdateChartData()
-
         return root
     }
 
-//    override fun onDestroyView() {
-//        super.onDestroyView()
-//        _binding = null
-//    }
-
-    fun setUpAAChartView() {
-        val aaChartView = binding.aaChartView
-        aaChartModel = configureAAChartModel()
-        aaChartView?.aa_drawChartWithChartModel(aaChartModel)
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
+        mHandler.removeCallbacksAndMessages(null)
     }
 
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        setUpAAChartView()
+        updateChartData()
+    }
+
+    private fun startUpdateTimer() {
+        // Start a timer to update the chart periodically
+        mHandler.postDelayed(object : Runnable {
+            override fun run() {
+                fetchDataFromApi(mApiUrl,
+                    { temperature, pressure, humidity ->
+                        temperatureAA += temperature.toFloat()
+//                        if (temperatureAA.size > 10) {
+//                            temperatureAA = temperatureAA.takeLast(10).toTypedArray()
+//                        }
+                        humidityAA += humidity.toFloat()
+//                        if (temperatureAA.size > 10) {
+//                            temperatureAA = temperatureAA.takeLast(10).toTypedArray()
+//                        }
+                        pressureAA += pressure.toFloat()
+//                        if (temperatureAA.size > 10) {
+//                            temperatureAA = temperatureAA.takeLast(10).toTypedArray()
+//                        }
+                        updateChartData()
+                    },
+                    { error ->
+                        // Error handler
+                    }
+                )
+                mHandler.postDelayed(this, mUpdateInterval)
+            }
+        }, mUpdateInterval)
+    }
+
+    private fun stopUpdateTimer() {
+        mHandler.removeCallbacksAndMessages(null)
+    }
+
+    override fun onResume() {
+        super.onResume()
+        startUpdateTimer()
+    }
+
+    override fun onPause() {
+        super.onPause()
+        stopUpdateTimer()
+    }
+
+    private fun setUpAAChartView() {
+        val aaChartView = binding.aaChartView
+        aaChartModel = configureAAChartModel()
+        aaChartView.aa_drawChartWithChartModel(aaChartModel)
+    }
+
+    @Suppress("UNCHECKED_CAST")
     private fun configureAAChartModel(): AAChartModel {
         val aaChartModel : AAChartModel = AAChartModel()
             .chartType(AAChartType.Line)
@@ -70,62 +124,38 @@ class PlotsFragment : Fragment() {
 
     @Suppress("UNCHECKED_CAST")
     private fun configureChartSeriesArray(): Array<AASeriesElement> {
-        var min = 10
-        var max = 25
-        var random = (Math.random() * (max - min) + min).toInt()
-        temperature += random
-        if (temperature.size > 10) {
-            temperature.drop(1)
-        }
-
-        min = 70
-        max = 95
-        random = (Math.random() * (max - min) + min).toInt()
-        humidity += random
-        if (humidity.size > 10) {
-            humidity.drop(1)
-        }
-
-        min = 1000
-        max = 1100
-        random = (Math.random() * (max - min) + min).toInt()
-        pressure += random
-        if (pressure.size > 10) {
-            pressure.drop(1)
-        }
-
         return arrayOf(
             AASeriesElement()
                 .name("Temperature")
-                .data(temperature as Array<Any>),
+                .data(temperatureAA as Array<Any>),
             AASeriesElement()
                 .name("Humidity")
-                .data(humidity as Array<Any>),
+                .data(humidityAA as Array<Any>),
             AASeriesElement()
                 .name("Pressure")
-                .data(pressure as Array<Any>),
+                .data(pressureAA as Array<Any>),
         )
     }
 
-    private fun repeatUpdateChartData() {
-        val mStartVideoHandler = Handler()
-        val mStartVideoRunnable: java.lang.Runnable = object : java.lang.Runnable {
-            override fun run() {
-                val seriesArr = configureChartSeriesArray()
-                binding!!.aaChartView?.aa_onlyRefreshTheChartDataWithChartOptionsSeriesArray(seriesArr)
+    private fun updateChartData() {
+        val seriesArr = configureChartSeriesArray()
+        binding.aaChartView.aa_onlyRefreshTheChartDataWithChartOptionsSeriesArray(seriesArr)
+    }
 
-//                var mSharedPreferences =
-//                    requireActivity().getSharedPreferences("app", Context.MODE_PRIVATE)
-//                var samplingTime = mSharedPreferences.getString("sampling_time" , "2000")
-//                if (samplingTime == null) {
-//                    samplingTime = "1000"
-//                }
+    private fun fetchDataFromApi(url: String, successListener: (Double, Double, Double) -> Unit, errorListener: (Exception) -> Unit) {
+        val requestQueue = Volley.newRequestQueue(context)
+        val jsonObjectRequest = JsonObjectRequest(
+            Request.Method.GET, url, null,
+            Response.Listener<JSONObject> { response ->
+                val temperature = response.getJSONObject("temperature").getDouble("value")
+                val pressure = response.getJSONObject("pressure").getDouble("value")
+                val humidity = response.getJSONObject("humidity").getDouble("value")
+                successListener(temperature, pressure, humidity)
+            },
+            Response.ErrorListener { error ->
+                errorListener(error)
+            })
 
-                //mStartVideoHandler.postDelayed(this, samplingTime.toLong())
-                mStartVideoHandler.postDelayed(this, 1000)
-            }
-        }
-
-        mStartVideoHandler.postDelayed(mStartVideoRunnable, 2000)
+        requestQueue.add(jsonObjectRequest)
     }
 }
