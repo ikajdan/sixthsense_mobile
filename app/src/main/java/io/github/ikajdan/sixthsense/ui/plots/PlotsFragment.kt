@@ -8,19 +8,16 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import com.android.volley.Request
-import com.android.volley.Response
 import com.android.volley.toolbox.JsonObjectRequest
 import com.android.volley.toolbox.Volley
 import com.github.aachartmodel.aainfographics.aachartcreator.*
 import io.github.ikajdan.sixthsense.databinding.FragmentPlotsBinding
 import kotlinx.coroutines.*
-import org.json.JSONObject
 
 class PlotsFragment : Fragment() {
     private var _binding: FragmentPlotsBinding? = null
     private val binding get() = _binding!!
 
-    private var aaChartView: AAChartView? = null
     private var aaChartModel = AAChartModel()
     private var temperatureAA = arrayOfNulls<Any>(10)
     private var humidityAA = arrayOfNulls<Any>(10)
@@ -30,17 +27,14 @@ class PlotsFragment : Fragment() {
     private val mApiUrl = "http://10.0.2.2:8080/v1/get/?t=c&p=hpa&h=perc"
     private val mUpdateInterval = 1000L
 
-    data class Temperature(val value: Double, val unit: String)
-
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentPlotsBinding.inflate(inflater, container, false)
-        val root: View = binding.root
 
-        return root
+        return binding.root
     }
 
     override fun onDestroyView() {
@@ -76,7 +70,7 @@ class PlotsFragment : Fragment() {
 //                        }
                         updateChartData()
                     },
-                    { error ->
+                    {
                         // Error handler
                     }
                 )
@@ -146,13 +140,13 @@ class PlotsFragment : Fragment() {
         val requestQueue = Volley.newRequestQueue(context)
         val jsonObjectRequest = JsonObjectRequest(
             Request.Method.GET, url, null,
-            Response.Listener<JSONObject> { response ->
+            { response ->
                 val temperature = response.getJSONObject("temperature").getDouble("value")
                 val pressure = response.getJSONObject("pressure").getDouble("value")
                 val humidity = response.getJSONObject("humidity").getDouble("value")
                 successListener(temperature, pressure, humidity)
             },
-            Response.ErrorListener { error ->
+            { error ->
                 errorListener(error)
             })
 
