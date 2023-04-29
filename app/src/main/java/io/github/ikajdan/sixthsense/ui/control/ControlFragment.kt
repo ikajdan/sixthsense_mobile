@@ -29,9 +29,12 @@ class ControlFragment : Fragment() {
         val port = ":" + "8080"
         val reqX = "x=" + binding.ledPosXInput.text.toString()
         val reqY = "y=" + binding.ledPosYInput.text.toString()
-        val reqColor = "c=" + binding.ledColorInput.text.toString()
+        val hexColor =  binding.ledColorInput.text.toString()
+        val reqR = "r=" + Integer.parseInt(hexColor.substring(0, 2), 16)
+        val reqG = "g=" + Integer.parseInt(hexColor.substring(2, 4), 16)
+        val reqB = "b=" + Integer.parseInt(hexColor.substring(4, 6), 16)
 
-        var url = "$host$port/index.php?$reqX&$reqY&$reqColor".lowercase()
+        var url = "$host$port/v1/set?$reqX&$reqY&$reqR&$reqG&$reqB".lowercase()
 
         if (url.isEmpty()) return
 
@@ -84,11 +87,13 @@ class ControlFragment : Fragment() {
             requestRoutine()
         }
 
+
+
         return root
     }
 
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null
-    }
+//    override fun onDestroyView() {
+//        super.onDestroyView()
+//        _binding = null
+//    }
 }
