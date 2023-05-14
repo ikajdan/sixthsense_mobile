@@ -40,6 +40,8 @@ class ControlFragment : Fragment() {
     }
 
     private fun setLedGrid() {
+        binding.progressBar.visibility = View.VISIBLE
+
         val hostNamePref = "laptop.lan"
         val portNumberPref = "8000"
         val id = binding.ledIdInput.text.toString()
@@ -49,6 +51,7 @@ class ControlFragment : Fragment() {
         val stringRequest = StringRequest(
             Request.Method.GET, apiEndpoint,
             {
+                binding.progressBar.visibility = View.INVISIBLE
             },
             {
             }

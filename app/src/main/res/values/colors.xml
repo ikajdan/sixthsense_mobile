@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="primary_200">#FFDADB</color>
-    <color name="primary_500">#EC407A</color>
-    <color name="primary_700">#B7315E</color>
-    <color name="secondary_200">#7FDBE8</color>
-    <color name="secondary_700">#0A92A3</color>
+    <color name="primary_500">#7FDBE8</color>
+    <color name="primary_700">#0A92A3</color>
+    <color name="secondary_200">#EC407A</color>
+    <color name="secondary_700">#B7315E</color>
     <color name="white">#FFFFFF</color>
     <color name="black">#000000</color>
 </resources>

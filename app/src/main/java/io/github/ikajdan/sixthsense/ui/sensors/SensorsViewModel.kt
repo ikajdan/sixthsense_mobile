@@ -7,7 +7,7 @@ import androidx.lifecycle.ViewModel
 class SensorsViewModel : ViewModel() {
 
     private val _text = MutableLiveData<String>().apply {
-        value = "This is sensors Fragment"
+        value = "Loading…"
     }
     val text: LiveData<String> = _text
 }

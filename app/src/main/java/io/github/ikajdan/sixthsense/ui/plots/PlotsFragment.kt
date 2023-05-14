@@ -6,12 +6,15 @@ import android.os.Looper
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.TextView
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProvider
 import com.android.volley.Request
 import com.android.volley.toolbox.JsonObjectRequest
 import com.android.volley.toolbox.Volley
 import com.github.aachartmodel.aainfographics.aachartcreator.*
-import com.github.aachartmodel.aainfographics.aaoptionsmodel.AAMarker
+import com.github.aachartmodel.aainfographics.aaoptionsmodel.*
+import com.github.dhaval2404.colorpicker.util.setVisibility
 import io.github.ikajdan.sixthsense.databinding.FragmentPlotsBinding
 import kotlinx.coroutines.*
 
@@ -33,7 +36,16 @@ class PlotsFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
+        val plotsViewModel = ViewModelProvider(this).get(PlotsViewModel::class.java)
+
         _binding = FragmentPlotsBinding.inflate(inflater, container, false)
+
+        val textView: TextView = binding.loadingPlaceholder
+        plotsViewModel.text.observe(viewLifecycleOwner) {
+            textView.text = it
+        }
+
+        binding.progressBar.visibility = View.VISIBLE
 
         return binding.root
     }
@@ -98,7 +110,30 @@ class PlotsFragment : Fragment() {
     private fun setUpAAChartView() {
         val aaChartView = binding.aaChartView
         aaChartModel = configureAAChartModel()
-        aaChartView.aa_drawChartWithChartModel(aaChartModel)
+
+        val aaOptions: AAOptions = aaChartModel.aa_toAAOptions()
+
+        aaOptions.yAxis(AAYAxis()
+            .gridLineColor("#FFFFFF20")
+            .title(AATitle()
+                .text(aaChartModel.yAxisTitle)
+            )
+        )
+            .tooltip(AATooltip()
+            .enabled(true)
+            .style(AAStyle()
+                .color("#ffffff")
+            )
+            .backgroundColor("#4a4458")
+            .borderColor("#e8def8")
+            .borderRadius(10f)
+            .borderWidth(1f)
+            .headerFormat("")
+            .valueDecimals(2)
+            .shared(true)
+        )
+
+        aaChartView?.aa_drawChartWithChartOptions(aaOptions)
     }
 
     @Suppress("UNCHECKED_CAST")
@@ -106,7 +141,7 @@ class PlotsFragment : Fragment() {
         val aaChartModel : AAChartModel = AAChartModel()
             .chartType(AAChartType.Line)
             .backgroundColor("#00000000")
-            .yAxisGridLineWidth(0)
+            .yAxisGridLineWidth(1)
             .xAxisVisible(false)
             .yAxisTitle("")
             .axesTextColor("#FFFFFF80")
@@ -159,6 +194,9 @@ class PlotsFragment : Fragment() {
         val jsonObjectRequest = JsonObjectRequest(
             Request.Method.GET, url, null,
             { response ->
+                binding.progressBar.visibility = View.INVISIBLE
+                binding.loadingPlaceholder.setVisibility(false)
+
                 val temperature = response.getJSONObject("temperature").getDouble("value")
                 val pressure = response.getJSONObject("pressure").getDouble("value")
                 val humidity = response.getJSONObject("humidity").getDouble("value")

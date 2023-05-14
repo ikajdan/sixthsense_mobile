@@ -7,10 +7,13 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
+import android.widget.TextView
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProvider
 import com.android.volley.Request
 import com.android.volley.toolbox.JsonObjectRequest
 import com.android.volley.toolbox.Volley
+import com.github.dhaval2404.colorpicker.util.setVisibility
 import io.github.ikajdan.sixthsense.databinding.FragmentSensorsBinding
 import java.math.BigDecimal
 import kotlin.math.round
@@ -18,7 +21,6 @@ import kotlin.math.round
 class SensorsFragment : Fragment() {
     private var _binding: FragmentSensorsBinding? = null
     private val binding get() = _binding!!
-
     private val mHandler = Handler(Looper.getMainLooper())
 
     private lateinit var adapter: ArrayAdapter<String>
@@ -29,8 +31,17 @@ class SensorsFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
+        val sensorsViewModel = ViewModelProvider(this).get(SensorsViewModel::class.java)
+
         _binding = FragmentSensorsBinding.inflate(inflater, container, false)
         val root: View = binding.root
+
+        val textView: TextView = binding.loadingPlaceholder
+        sensorsViewModel.text.observe(viewLifecycleOwner) {
+            textView.text = it
+        }
+
+        binding.progressBar.visibility = View.VISIBLE
 
         data = mutableListOf()
         adapter = ArrayAdapter(requireContext(), android.R.layout.simple_list_item_1, data)
@@ -81,6 +92,9 @@ class SensorsFragment : Fragment() {
         val jsonObjectRequest = JsonObjectRequest(
             Request.Method.GET, apiEndpoint, null,
             { response ->
+                binding.progressBar.visibility = View.INVISIBLE
+                binding.loadingPlaceholder.setVisibility(false)
+
                 data.clear()
                 for (key in response.keys()) {
                     val innerObject = response.getJSONObject(key)

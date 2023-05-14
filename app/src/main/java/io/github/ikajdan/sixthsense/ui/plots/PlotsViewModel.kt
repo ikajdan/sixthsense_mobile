@@ -7,7 +7,7 @@ import androidx.lifecycle.ViewModel
 class PlotsViewModel : ViewModel() {
 
     private val _text = MutableLiveData<String>().apply {
-        value = "This is plots Fragment"
+        value = "Loading…"
     }
     val text: LiveData<String> = _text
 }
