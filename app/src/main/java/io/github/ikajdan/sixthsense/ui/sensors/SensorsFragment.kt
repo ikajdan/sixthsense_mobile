@@ -7,22 +7,22 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
-import android.widget.ListView
+import android.widget.TextView
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProvider
 import com.android.volley.Request
 import com.android.volley.toolbox.JsonObjectRequest
 import com.android.volley.toolbox.Volley
 import io.github.ikajdan.sixthsense.databinding.FragmentSensorsBinding
+import org.json.JSONObject
+import kotlin.math.round
 
 class SensorsFragment : Fragment() {
     private var _binding: FragmentSensorsBinding? = null
     private val binding get() = _binding!!
 
     private val mHandler = Handler(Looper.getMainLooper())
-    private val mApiUrl = "http://10.0.2.2:8080/v1/get/?t=c&p=hpa&h=perc&ro=deg&pi=deg&ya=deg"
-    private val mUpdateInterval = 1000L
 
-    private lateinit var listView: ListView
     private lateinit var adapter: ArrayAdapter<String>
     private lateinit var data: MutableList<String>
 
@@ -31,9 +31,6 @@ class SensorsFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-//        val sensorsViewModel =
-//            ViewModelProvider(this)[SensorsViewModel::class.java]
-
         _binding = FragmentSensorsBinding.inflate(inflater, container, false)
         val root: View = binding.root
 
@@ -41,12 +38,8 @@ class SensorsFragment : Fragment() {
         adapter = ArrayAdapter(requireContext(), android.R.layout.simple_list_item_1, data)
         this.binding.listView.adapter = adapter
 
-        fetchDataFromApi(mApiUrl)
+        updateSensorsData()
 
-//        val textView: TextView = binding.textSensors
-//        sensorsViewModel.text.observe(viewLifecycleOwner) {
-//            textView.text = it
-//        }
         return root
     }
     override fun onDestroyView() {
@@ -56,13 +49,14 @@ class SensorsFragment : Fragment() {
     }
 
     private fun startUpdateTimer() {
+        val updateIntervalPref = 1000L
         // Start a timer to update the chart periodically
         mHandler.postDelayed(object : Runnable {
             override fun run() {
-                fetchDataFromApi(mApiUrl)
-                mHandler.postDelayed(this, mUpdateInterval)
+                updateSensorsData()
+                mHandler.postDelayed(this, updateIntervalPref)
             }
-        }, mUpdateInterval)
+        }, updateIntervalPref)
     }
 
     private fun stopUpdateTimer() {
@@ -79,30 +73,31 @@ class SensorsFragment : Fragment() {
         stopUpdateTimer()
     }
 
-    private fun fetchDataFromApi(url: String) {
+    private fun updateSensorsData() {
+        val hostNamePref = "laptop.lan"
+        val portNumberPref = "8000"
+        val apiEndpoint =
+            "http://$hostNamePref:$portNumberPref/sensors/all/?t=c&p=hpa&h=perc&ro=deg&pi=deg&ya=deg"
         val requestQueue = Volley.newRequestQueue(context)
         val jsonObjectRequest = JsonObjectRequest(
-            Request.Method.GET, url, null,
+            Request.Method.GET, apiEndpoint, null,
             { response ->
                 data.clear()
-                data.add("Temperature: ${response.getJSONObject("temperature").getDouble("value")}" + " " +
-                        response.getJSONObject("temperature").getString("unit")
-                )
-                data.add("Pressure: ${response.getJSONObject("pressure").getDouble("value")}" + " " +
-                        response.getJSONObject("pressure").getString("unit")
-                )
-                data.add("Humidity: ${response.getJSONObject("humidity").getDouble("value")}" + " " +
-                        response.getJSONObject("humidity").getString("unit")
-                )
-                data.add("Roll: ${response.getJSONObject("roll").getDouble("value")}" + " " +
-                        response.getJSONObject("roll").getString("unit")
-                )
-                data.add("Pitch: ${response.getJSONObject("pitch").getDouble("value")}" + " " +
-                        response.getJSONObject("pitch").getString("unit")
-                )
-                data.add("Yaw: ${response.getJSONObject("yaw").getDouble("value")}" + " " +
-                        response.getJSONObject("yaw").getString("unit")
-                )
+                for (key in response.keys()) {
+                    val innerObject = response.getJSONObject(key)
+                    val name = innerObject.getString("name")
+                    var value = innerObject.getDouble("value")
+                    val unit = innerObject.getString("unit")
+
+                    value = round(value * 100) / 100
+
+                    if (value == 0.0) {
+                        // Print doubles as 0 instead of 0.0
+                        data.add(name + ": " + value.toInt() + unit)
+                    } else {
+                        data.add("$name: $value$unit")
+                    }
+                }
                 adapter.notifyDataSetChanged()
             },
             {

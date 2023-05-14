@@ -24,7 +24,7 @@ class PlotsFragment : Fragment() {
     private var pressureAA = arrayOfNulls<Any>(10)
 
     private val mHandler = Handler(Looper.getMainLooper())
-    private val mApiUrl = "http://10.0.2.2:8080/v1/get/?t=c&p=hpa&h=perc"
+    private val mApiUrl = "http://laptop.lan:8000/sensors/all/?t=c&p=hpa&h=perc"
     private val mUpdateInterval = 1000L
 
     override fun onCreateView(
@@ -104,13 +104,13 @@ class PlotsFragment : Fragment() {
         val aaChartModel : AAChartModel = AAChartModel()
             .chartType(AAChartType.Line)
             .backgroundColor("#00000000")
-            .colorsTheme(arrayOf("#b41c56", "#da215e", "#ec8dad"))
+            .colorsTheme(arrayOf("#f66151", "#f8e45c", "#62a0ea"))
             .yAxisGridLineWidth(0)
             .markerRadius(0)
             .xAxisVisible(false)
-            .yAxisTitle("Temperature (°C), Humidity (%), Pressure (hPa)")
+            .yAxisTitle("")
             .axesTextColor("#FFFFFF80")
-            .animationType(AAChartAnimationType.EaseInOutQuint)
+            .animationDuration(0)
         aaChartModel.series(this.configureChartSeriesArray() as Array<Any>)
 
         return aaChartModel
@@ -120,14 +120,14 @@ class PlotsFragment : Fragment() {
     private fun configureChartSeriesArray(): Array<AASeriesElement> {
         return arrayOf(
             AASeriesElement()
-                .name("Temperature")
+                .name("Temperature [°C]")
                 .data(temperatureAA as Array<Any>),
             AASeriesElement()
-                .name("Humidity")
-                .data(humidityAA as Array<Any>),
-            AASeriesElement()
-                .name("Pressure")
+                .name("Pressure [hPa]")
                 .data(pressureAA as Array<Any>),
+            AASeriesElement()
+                .name("Humidity [%]")
+                .data(humidityAA as Array<Any>),
         )
     }
 
