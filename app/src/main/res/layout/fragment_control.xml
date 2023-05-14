@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    xmlns:pikolo="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:layout_marginLeft="24dp"
@@ -19,41 +19,18 @@
         app:layout_constraintTop_toTopOf="parent">
 
         <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/ledPosX"
+            android:id="@+id/ledId"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginEnd="24dp"
             android:layout_weight="0.2"
-            android:hint="X"
+            android:hint="LED"
             app:layout_constraintEnd_toStartOf="@+id/ledPosY"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent">
 
             <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/ledPosXInput"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:inputType="numberSigned"
-                android:maxLength="2"
-                android:maxLines="1"
-                android:text="0" />
-
-        </com.google.android.material.textfield.TextInputLayout>
-
-        <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/ledPosY"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="24dp"
-            android:layout_weight="0.2"
-            android:hint="Y"
-            app:layout_constraintBottom_toBottomOf="@+id/ledPosX"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@id/ledPosX"
-            app:layout_constraintTop_toTopOf="@+id/ledPosX">
-
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/ledPosYInput"
+                android:id="@+id/ledIdInput"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:inputType="numberSigned"
@@ -69,10 +46,10 @@
             android:layout_height="wrap_content"
             android:layout_weight="0.6"
             android:hint="Color"
-            app:layout_constraintBottom_toBottomOf="@+id/ledPosX"
+            app:layout_constraintBottom_toBottomOf="@+id/ledId"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@id/ledPosX"
-            app:layout_constraintTop_toTopOf="@+id/ledPosX">
+            app:layout_constraintStart_toEndOf="@id/ledId"
+            app:layout_constraintTop_toTopOf="@+id/ledId">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/ledColorInput"
@@ -86,44 +63,18 @@
         </com.google.android.material.textfield.TextInputLayout>
     </LinearLayout>
 
-    <com.madrapps.pikolo.RGBColorPicker
-        android:id="@+id/colorPicker"
+    <com.github.dhaval2404.colorpicker.ColorPickerView
+        android:id="@+id/colorPickerView"
         android:layout_width="wrap_content"
         android:layout_height="0dp"
-        android:layout_marginLeft="24dp"
-        android:layout_marginTop="16dp"
-        android:layout_marginRight="24dp"
-        android:layout_marginBottom="16dp"
-        pikolo:indicator_stroke_width="0dp"
-        pikolo:indicator_radius="15dp"
-        pikolo:arc_width="10dp"
-        pikolo:arc_length="110"
-        pikolo:red_start_angle="30"
-        pikolo:green_start_angle="150"
-        pikolo:blue_start_angle="270"
+        android:layout_gravity="center|center_horizontal"
+        android:layout_marginTop="64dp"
         app:layout_constraintBottom_toTopOf="@+id/requestButton"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/linearLayout"
-        tools:layout_constraintBottom_creator="1"
-        tools:layout_constraintLeft_creator="1"
-        tools:layout_constraintRight_creator="1"
-        tools:layout_constraintTop_creator="1" />
-
-    <ImageView
-        android:id="@+id/imageView"
-        android:layout_width="100dp"
-        android:layout_height="100dp"
-        android:layout_marginBottom="8dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:background="@drawable/bg_circle"
-        app:layout_constraintBottom_toBottomOf="@+id/colorPicker"
-        app:layout_constraintEnd_toEndOf="@+id/colorPicker"
-        app:layout_constraintStart_toStartOf="@+id/colorPicker"
-        app:layout_constraintTop_toTopOf="@+id/colorPicker"
-        tools:ignore="ContentDescription" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/linearLayout"
+        app:layout_constraintVertical_bias="1.0" />
 
     <Button
         android:id="@+id/requestButton"

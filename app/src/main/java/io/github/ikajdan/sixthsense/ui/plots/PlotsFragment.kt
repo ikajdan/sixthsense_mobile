@@ -11,6 +11,7 @@ import com.android.volley.Request
 import com.android.volley.toolbox.JsonObjectRequest
 import com.android.volley.toolbox.Volley
 import com.github.aachartmodel.aainfographics.aachartcreator.*
+import com.github.aachartmodel.aainfographics.aaoptionsmodel.AAMarker
 import io.github.ikajdan.sixthsense.databinding.FragmentPlotsBinding
 import kotlinx.coroutines.*
 
@@ -24,7 +25,7 @@ class PlotsFragment : Fragment() {
     private var pressureAA = arrayOfNulls<Any>(10)
 
     private val mHandler = Handler(Looper.getMainLooper())
-    private val mApiUrl = "http://laptop.lan:8000/sensors/all/?t=c&p=hpa&h=perc"
+    private val mApiUrl = "http://laptop.lan:8000/sensors/all?t=c&p=hpa&h=perc"
     private val mUpdateInterval = 1000L
 
     override fun onCreateView(
@@ -47,31 +48,32 @@ class PlotsFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         setUpAAChartView()
-        updateChartData()
     }
 
     private fun startUpdateTimer() {
         // Start a timer to update the chart periodically
         mHandler.postDelayed(object : Runnable {
             override fun run() {
-                fetchDataFromApi(mApiUrl,
+                updateSensorsPlot(mApiUrl,
                     { temperature, pressure, humidity ->
                         temperatureAA += temperature.toFloat()
-//                        if (temperatureAA.size > 10) {
-//                            temperatureAA = temperatureAA.takeLast(10).toTypedArray()
-//                        }
+                        if (temperatureAA.size > 10) {
+                            temperatureAA = temperatureAA.takeLast(10).toTypedArray()
+                        }
                         humidityAA += humidity.toFloat()
-//                        if (temperatureAA.size > 10) {
-//                            temperatureAA = temperatureAA.takeLast(10).toTypedArray()
-//                        }
+                        if (humidityAA.size > 10) {
+                            humidityAA = humidityAA.takeLast(10).toTypedArray()
+                        }
                         pressureAA += pressure.toFloat()
-//                        if (temperatureAA.size > 10) {
-//                            temperatureAA = temperatureAA.takeLast(10).toTypedArray()
-//                        }
-                        updateChartData()
+                        if (pressureAA.size > 10) {
+                            pressureAA = pressureAA.takeLast(10).toTypedArray()
+                        }
+
+                        val seriesArr = configureChartSeriesArray()
+
+                        binding.aaChartView.aa_onlyRefreshTheChartDataWithChartOptionsSeriesArray(seriesArr)
                     },
                     {
-                        // Error handler
                     }
                 )
                 mHandler.postDelayed(this, mUpdateInterval)
@@ -104,13 +106,10 @@ class PlotsFragment : Fragment() {
         val aaChartModel : AAChartModel = AAChartModel()
             .chartType(AAChartType.Line)
             .backgroundColor("#00000000")
-            .colorsTheme(arrayOf("#f66151", "#f8e45c", "#62a0ea"))
             .yAxisGridLineWidth(0)
-            .markerRadius(0)
             .xAxisVisible(false)
             .yAxisTitle("")
             .axesTextColor("#FFFFFF80")
-            .animationDuration(0)
         aaChartModel.series(this.configureChartSeriesArray() as Array<Any>)
 
         return aaChartModel
@@ -121,22 +120,41 @@ class PlotsFragment : Fragment() {
         return arrayOf(
             AASeriesElement()
                 .name("Temperature [°C]")
-                .data(temperatureAA as Array<Any>),
+                .data(temperatureAA as Array<Any>)
+                .marker(
+                    AAMarker()
+                        .radius(3f)
+                        .fillColor("#f66151")
+                        .lineWidth(2f)
+                        .lineColor("#f66151")
+                        .symbol(AAChartSymbolType.Circle.value)
+                ),
             AASeriesElement()
                 .name("Pressure [hPa]")
-                .data(pressureAA as Array<Any>),
+                .data(pressureAA as Array<Any>)
+                .marker(
+                    AAMarker()
+                        .radius(3f)
+                        .fillColor("#f8e45c")
+                        .lineWidth(2f)
+                        .lineColor("#f8e45c")
+                        .symbol(AAChartSymbolType.Circle.value)
+                ),
             AASeriesElement()
                 .name("Humidity [%]")
-                .data(humidityAA as Array<Any>),
+                .data(humidityAA as Array<Any>)
+                .marker(
+                    AAMarker()
+                        .radius(3f)
+                        .fillColor("#62a0ea")
+                        .lineWidth(2f)
+                        .lineColor("#62a0ea")
+                        .symbol(AAChartSymbolType.Circle.value)
+                )
         )
     }
 
-    private fun updateChartData() {
-        val seriesArr = configureChartSeriesArray()
-        binding.aaChartView.aa_onlyRefreshTheChartDataWithChartOptionsSeriesArray(seriesArr)
-    }
-
-    private fun fetchDataFromApi(url: String, successListener: (Double, Double, Double) -> Unit, errorListener: (Exception) -> Unit) {
+    private fun updateSensorsPlot(url: String, successListener: (Double, Double, Double) -> Unit, errorListener: (Exception) -> Unit) {
         val requestQueue = Volley.newRequestQueue(context)
         val jsonObjectRequest = JsonObjectRequest(
             Request.Method.GET, url, null,

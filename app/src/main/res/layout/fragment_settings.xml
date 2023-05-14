@@ -16,7 +16,7 @@
         app:layout_constraintTop_toTopOf="parent">
 
         <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/ledPosX"
+            android:id="@+id/ledId"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="24dp"
@@ -28,7 +28,7 @@
             app:layout_constraintTop_toTopOf="parent">
 
             <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/ledPosXInput"
+                android:id="@+id/ledIdInput"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:inputType="textUri"
@@ -44,10 +44,10 @@
             android:layout_marginEnd="24dp"
             android:layout_weight="0.3"
             android:hint="@string/settings_port"
-            app:layout_constraintBottom_toBottomOf="@+id/ledPosX"
+            app:layout_constraintBottom_toBottomOf="@+id/ledId"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@id/ledPosX"
-            app:layout_constraintTop_toTopOf="@+id/ledPosX">
+            app:layout_constraintStart_toEndOf="@id/ledId"
+            app:layout_constraintTop_toTopOf="@+id/ledId">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/ledPosYInput"

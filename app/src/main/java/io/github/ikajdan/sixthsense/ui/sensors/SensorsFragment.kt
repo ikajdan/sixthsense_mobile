@@ -7,14 +7,12 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
-import android.widget.TextView
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProvider
 import com.android.volley.Request
 import com.android.volley.toolbox.JsonObjectRequest
 import com.android.volley.toolbox.Volley
 import io.github.ikajdan.sixthsense.databinding.FragmentSensorsBinding
-import org.json.JSONObject
+import java.math.BigDecimal
 import kotlin.math.round
 
 class SensorsFragment : Fragment() {
@@ -42,6 +40,7 @@ class SensorsFragment : Fragment() {
 
         return root
     }
+
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
@@ -77,7 +76,7 @@ class SensorsFragment : Fragment() {
         val hostNamePref = "laptop.lan"
         val portNumberPref = "8000"
         val apiEndpoint =
-            "http://$hostNamePref:$portNumberPref/sensors/all/?t=c&p=hpa&h=perc&ro=deg&pi=deg&ya=deg"
+            "http://$hostNamePref:$portNumberPref/sensors/all?t=c&p=hpa&h=perc&ro=deg&pi=deg&ya=deg"
         val requestQueue = Volley.newRequestQueue(context)
         val jsonObjectRequest = JsonObjectRequest(
             Request.Method.GET, apiEndpoint, null,
@@ -91,12 +90,10 @@ class SensorsFragment : Fragment() {
 
                     value = round(value * 100) / 100
 
-                    if (value == 0.0) {
-                        // Print doubles as 0 instead of 0.0
-                        data.add(name + ": " + value.toInt() + unit)
-                    } else {
-                        data.add("$name: $value$unit")
-                    }
+                    // Trim trailing zeros
+                    val bValue = BigDecimal.valueOf(value).stripTrailingZeros().toPlainString()
+
+                    data.add("$name: $bValue$unit")
                 }
                 adapter.notifyDataSetChanged()
             },
