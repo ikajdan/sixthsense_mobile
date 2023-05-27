@@ -1,5 +1,6 @@
 package io.github.ikajdan.sixthsense.ui.control
 
+import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -42,8 +43,9 @@ class ControlFragment : Fragment() {
     private fun setLedGrid() {
         binding.progressBar.visibility = View.VISIBLE
 
-        val hostNamePref = "laptop.lan"
-        val portNumberPref = "8000"
+        val sharedPref = context?.getSharedPreferences("settings", Context.MODE_PRIVATE)
+        val hostNamePref = sharedPref?.getString("host_name", "laptop.lan").toString()
+        val portNumberPref = sharedPref?.getInt("port_number", 8000).toString()
         val id = binding.ledIdInput.text.toString()
         val color =  binding.ledColorInput.text.toString().lowercase()
         val apiEndpoint = "http://$hostNamePref:$portNumberPref/leds/set/$id?hex=$color"

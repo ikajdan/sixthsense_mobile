@@ -16,19 +16,19 @@
         app:layout_constraintTop_toTopOf="parent">
 
         <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/ledId"
+            android:id="@+id/host"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="24dp"
             android:layout_marginEnd="24dp"
             android:layout_weight="0.7"
             android:hint="@string/serttins_host"
-            app:layout_constraintEnd_toStartOf="@+id/ledPosY"
+            app:layout_constraintEnd_toStartOf="@+id/port"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent">
 
             <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/ledIdInput"
+                android:id="@+id/hostInput"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:inputType="textUri"
@@ -38,19 +38,19 @@
         </com.google.android.material.textfield.TextInputLayout>
 
         <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/ledPosY"
+            android:id="@+id/port"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginEnd="24dp"
             android:layout_weight="0.3"
             android:hint="@string/settings_port"
-            app:layout_constraintBottom_toBottomOf="@+id/ledId"
+            app:layout_constraintBottom_toBottomOf="@+id/host"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@id/ledId"
-            app:layout_constraintTop_toTopOf="@+id/ledId">
+            app:layout_constraintStart_toEndOf="@id/host"
+            app:layout_constraintTop_toTopOf="@+id/host">
 
             <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/ledPosYInput"
+                android:id="@+id/portInput"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:inputType="numberSigned"
@@ -83,4 +83,15 @@
             android:text="1000" />
 
     </com.google.android.material.textfield.TextInputLayout>
+
+    <Button
+        android:id="@+id/saveButton"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="24dp"
+        android:layout_marginEnd="24dp"
+        android:text="@string/save"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
 </androidx.constraintlayout.widget.ConstraintLayout>

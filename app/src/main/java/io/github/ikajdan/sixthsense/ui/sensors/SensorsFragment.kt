@@ -1,5 +1,6 @@
 package io.github.ikajdan.sixthsense.ui.sensors
 
+import android.content.Context
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -59,14 +60,19 @@ class SensorsFragment : Fragment() {
     }
 
     private fun startUpdateTimer() {
-        val updateIntervalPref = 1000L
+        val sharedPref = context?.getSharedPreferences("settings", Context.MODE_PRIVATE)
+        var updateIntervalPref = sharedPref?.getInt("sampling_time", 1000)
         // Start a timer to update the chart periodically
-        mHandler.postDelayed(object : Runnable {
-            override fun run() {
-                updateSensorsData()
-                mHandler.postDelayed(this, updateIntervalPref)
-            }
-        }, updateIntervalPref)
+        if (updateIntervalPref != null) {
+            mHandler.postDelayed(object : Runnable {
+                override fun run() {
+                    updateSensorsData()
+                    if (updateIntervalPref != null) {
+                        mHandler.postDelayed(this, updateIntervalPref.toLong())
+                    }
+                }
+            }, updateIntervalPref.toLong())
+        }
     }
 
     private fun stopUpdateTimer() {
@@ -84,8 +90,9 @@ class SensorsFragment : Fragment() {
     }
 
     private fun updateSensorsData() {
-        val hostNamePref = "laptop.lan"
-        val portNumberPref = "8000"
+        val sharedPref = context?.getSharedPreferences("settings", Context.MODE_PRIVATE)
+        val hostNamePref = sharedPref?.getString("host_name", "laptop.lan").toString()
+        val portNumberPref = sharedPref?.getInt("port_number", 8000).toString()
         val apiEndpoint =
             "http://$hostNamePref:$portNumberPref/sensors/all?t=c&p=hpa&h=perc&ro=deg&pi=deg&ya=deg"
         val requestQueue = Volley.newRequestQueue(context)

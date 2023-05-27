@@ -1,5 +1,7 @@
 package io.github.ikajdan.sixthsense.ui.plots
 
+import android.content.Context
+import android.content.SharedPreferences
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -28,9 +30,6 @@ class PlotsFragment : Fragment() {
     private var pressureAA = arrayOfNulls<Any>(10)
 
     private val mHandler = Handler(Looper.getMainLooper())
-    private val mApiUrl = "http://laptop.lan:8000/sensors/all?t=c&p=hpa&h=perc"
-    private val mUpdateInterval = 1000L
-
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -56,6 +55,8 @@ class PlotsFragment : Fragment() {
         mHandler.removeCallbacksAndMessages(null)
     }
 
+
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -63,34 +64,44 @@ class PlotsFragment : Fragment() {
     }
 
     private fun startUpdateTimer() {
+        val sharedPref = context?.getSharedPreferences("settings", Context.MODE_PRIVATE)
+        val hostNamePref = sharedPref?.getString("host_name", "laptop.lan").toString()
+        val portNumberPref = sharedPref?.getInt("port_number", 8000).toString()
+        val apiEndpoint = "http://$hostNamePref:$portNumberPref/sensors/all?t=c&p=hpa&h=perc"
+        var updateIntervalPref = sharedPref?.getInt("sampling_time", 1000)
+
         // Start a timer to update the chart periodically
-        mHandler.postDelayed(object : Runnable {
-            override fun run() {
-                updateSensorsPlot(mApiUrl,
-                    { temperature, pressure, humidity ->
-                        temperatureAA += temperature.toFloat()
-                        if (temperatureAA.size > 10) {
-                            temperatureAA = temperatureAA.takeLast(10).toTypedArray()
-                        }
-                        humidityAA += humidity.toFloat()
-                        if (humidityAA.size > 10) {
-                            humidityAA = humidityAA.takeLast(10).toTypedArray()
-                        }
-                        pressureAA += pressure.toFloat()
-                        if (pressureAA.size > 10) {
-                            pressureAA = pressureAA.takeLast(10).toTypedArray()
-                        }
+        if (updateIntervalPref != null) {
+            mHandler.postDelayed(object : Runnable {
+                override fun run() {
+                    updateSensorsPlot(apiEndpoint,
+                        { temperature, pressure, humidity ->
+                            temperatureAA += temperature.toFloat()
+                            if (temperatureAA.size > 10) {
+                                temperatureAA = temperatureAA.takeLast(10).toTypedArray()
+                            }
+                            humidityAA += humidity.toFloat()
+                            if (humidityAA.size > 10) {
+                                humidityAA = humidityAA.takeLast(10).toTypedArray()
+                            }
+                            pressureAA += pressure.toFloat()
+                            if (pressureAA.size > 10) {
+                                pressureAA = pressureAA.takeLast(10).toTypedArray()
+                            }
 
-                        val seriesArr = configureChartSeriesArray()
+                            val seriesArr = configureChartSeriesArray()
 
-                        binding.aaChartView.aa_onlyRefreshTheChartDataWithChartOptionsSeriesArray(seriesArr)
-                    },
-                    {
+                            binding.aaChartView.aa_onlyRefreshTheChartDataWithChartOptionsSeriesArray(seriesArr)
+                        },
+                        {
+                        }
+                    )
+                    if (updateIntervalPref != null) {
+                        mHandler.postDelayed(this, updateIntervalPref.toLong())
                     }
-                )
-                mHandler.postDelayed(this, mUpdateInterval)
-            }
-        }, mUpdateInterval)
+                }
+            }, updateIntervalPref.toLong())
+        }
     }
 
     private fun stopUpdateTimer() {
