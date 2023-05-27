@@ -53,11 +53,11 @@ class SensorsFragment : Fragment() {
         return root
     }
 
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null
-        mHandler.removeCallbacksAndMessages(null)
-    }
+//    override fun onDestroyView() {
+//        super.onDestroyView()
+//        _binding = null
+//        mHandler.removeCallbacksAndMessages(null)
+//    }
 
     private fun startUpdateTimer() {
         val sharedPref = context?.getSharedPreferences("settings", Context.MODE_PRIVATE)

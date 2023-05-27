@@ -49,13 +49,11 @@ class PlotsFragment : Fragment() {
         return binding.root
     }
 
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null
-        mHandler.removeCallbacksAndMessages(null)
-    }
-
-
+//    override fun onDestroyView() {
+//        super.onDestroyView()
+//        _binding = null
+//        mHandler.removeCallbacksAndMessages(null)
+//    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
