@@ -19,6 +19,9 @@ import io.github.ikajdan.sixthsense.databinding.FragmentSensorsBinding
 import java.math.BigDecimal
 import kotlin.math.round
 
+/**
+ * A fragment that displays sensor data.
+ */
 class SensorsFragment : Fragment() {
     private var _binding: FragmentSensorsBinding? = null
     private val binding get() = _binding!!
@@ -27,6 +30,14 @@ class SensorsFragment : Fragment() {
     private lateinit var adapter: ArrayAdapter<String>
     private lateinit var data: MutableList<String>
 
+    /**
+     * Called to create the view hierarchy associated with the fragment.
+     *
+     * @param inflater           The LayoutInflater object that can be used to inflate any views in the fragment.
+     * @param container          The parent view that the fragment's UI should be attached to.
+     * @param savedInstanceState This fragment is being re-constructed from a previous saved state.
+     * @return The View for the fragment's UI.
+     */
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -59,6 +70,9 @@ class SensorsFragment : Fragment() {
 //        mHandler.removeCallbacksAndMessages(null)
 //    }
 
+    /**
+     * Starts a timer to update the sensors data periodically.
+     */
     private fun startUpdateTimer() {
         val sharedPref = context?.getSharedPreferences("settings", Context.MODE_PRIVATE)
         var updateIntervalPref = sharedPref?.getInt("sampling_time", 1000)
@@ -75,20 +89,32 @@ class SensorsFragment : Fragment() {
         }
     }
 
+    /**
+     * Stops the update timer.
+     */
     private fun stopUpdateTimer() {
         mHandler.removeCallbacksAndMessages(null)
     }
 
+    /**
+     * Called when the fragment is visible to the user and actively running.
+     */
     override fun onResume() {
         super.onResume()
         startUpdateTimer()
     }
 
+    /**
+     * Called when the Fragment is no longer resumed.
+     */
     override fun onPause() {
         super.onPause()
         stopUpdateTimer()
     }
 
+    /**
+     * Fetches sensor data from the server and updates the UI.
+     */
     private fun updateSensorsData() {
         val sharedPref = context?.getSharedPreferences("settings", Context.MODE_PRIVATE)
         val hostNamePref = sharedPref?.getString("host_name", "laptop.lan").toString()

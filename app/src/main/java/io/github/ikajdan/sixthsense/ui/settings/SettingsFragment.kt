@@ -8,6 +8,9 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import io.github.ikajdan.sixthsense.databinding.FragmentSettingsBinding
 
+/**
+ * @brief Fragment class for the settings screen.
+ */
 class SettingsFragment : Fragment() {
 
     private var _binding: FragmentSettingsBinding? = null
@@ -16,6 +19,14 @@ class SettingsFragment : Fragment() {
     // onDestroyView.
     private val binding get() = _binding!!
 
+    /**
+     * Creates and returns the view hierarchy associated with the fragment.
+     *
+     * @param inflater The LayoutInflater object that can be used to inflate any views in the fragment.
+     * @param container If non-null, this is the parent view that the fragment's UI should be attached to.
+     * @param savedInstanceState If non-null, this fragment is being re-constructed from a previous saved state.
+     * @return The root View of the fragment's layout.
+     */
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -52,6 +63,9 @@ class SettingsFragment : Fragment() {
         return root
     }
 
+    /**
+     * Called when the fragment's view is destroyed.
+     */
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null

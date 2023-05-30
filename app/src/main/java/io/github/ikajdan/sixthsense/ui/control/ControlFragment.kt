@@ -11,10 +11,22 @@ import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
 import io.github.ikajdan.sixthsense.databinding.FragmentControlBinding
 
+/**
+ * A fragment that displays the control functionality for LEDs.
+ * Allows users to set LED colors using a color picker and send requests to update the LED grid.
+ */
 class ControlFragment : Fragment() {
     private var _binding: FragmentControlBinding? = null
     private val binding get() = _binding!!
 
+    /**
+     * Creates and returns the view hierarchy associated with the fragment.
+     *
+     * @param inflater The LayoutInflater object that can be used to inflate any views in the fragment.
+     * @param container If non-null, this is the parent view that the fragment's UI should be attached to.
+     * @param savedInstanceState If non-null, this fragment is being re-constructed from a previous saved state.
+     * @return Return the View for the fragment's UI, or null.
+     */
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -35,11 +47,19 @@ class ControlFragment : Fragment() {
         return root
     }
 
+    /**
+     * Called when the view previously created by onCreateView() has been detached from the fragment.
+     * Clean up resources associated with the view.
+     */
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
     }
 
+    /**
+     * Sets the LED grid based on the user-selected color.
+     * Sends a request to the server to update the LED grid.
+     */
     private fun setLedGrid() {
         binding.progressBar.visibility = View.VISIBLE
 

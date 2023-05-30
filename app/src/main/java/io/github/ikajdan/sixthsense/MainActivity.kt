@@ -9,6 +9,11 @@ import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import io.github.ikajdan.sixthsense.databinding.ActivityMainBinding
 
+
+/**
+ * The main activity of the application.
+ * This activity sets up the navigation and the bottom navigation view.
+ */
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding

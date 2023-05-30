@@ -20,6 +20,9 @@ import com.github.dhaval2404.colorpicker.util.setVisibility
 import io.github.ikajdan.sixthsense.databinding.FragmentPlotsBinding
 import kotlinx.coroutines.*
 
+/**
+ * Fragment class for displaying plots.
+ */
 class PlotsFragment : Fragment() {
     private var _binding: FragmentPlotsBinding? = null
     private val binding get() = _binding!!
@@ -30,6 +33,10 @@ class PlotsFragment : Fragment() {
     private var pressureAA = arrayOfNulls<Any>(10)
 
     private val mHandler = Handler(Looper.getMainLooper())
+
+    /**
+     * Creates and returns the view hierarchy associated with the fragment.
+     */
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -55,12 +62,18 @@ class PlotsFragment : Fragment() {
 //        mHandler.removeCallbacksAndMessages(null)
 //    }
 
+    /**
+     * Called when the view has been created.
+     */
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
         setUpAAChartView()
     }
 
+    /**
+     * Starts the timer to update the chart periodically.
+     */
     private fun startUpdateTimer() {
         val sharedPref = context?.getSharedPreferences("settings", Context.MODE_PRIVATE)
         val hostNamePref = sharedPref?.getString("host_name", "laptop.lan").toString()
@@ -102,20 +115,32 @@ class PlotsFragment : Fragment() {
         }
     }
 
+    /**
+     * Stops the timer used for updating the chart.
+     */
     private fun stopUpdateTimer() {
         mHandler.removeCallbacksAndMessages(null)
     }
 
+    /**
+     * Called when the fragment is resumed.
+     */
     override fun onResume() {
         super.onResume()
         startUpdateTimer()
     }
 
+    /**
+     * Called when the fragment is paused.
+     */
     override fun onPause() {
         super.onPause()
         stopUpdateTimer()
     }
 
+    /**
+     * Sets up the AAChartView for displaying the chart.
+     */
     private fun setUpAAChartView() {
         val aaChartView = binding.aaChartView
         aaChartModel = configureAAChartModel()
@@ -145,6 +170,9 @@ class PlotsFragment : Fragment() {
         aaChartView?.aa_drawChartWithChartOptions(aaOptions)
     }
 
+    /**
+     * Configures the AAChartModel for the chart.
+     */
     @Suppress("UNCHECKED_CAST")
     private fun configureAAChartModel(): AAChartModel {
         val aaChartModel : AAChartModel = AAChartModel()
@@ -159,6 +187,9 @@ class PlotsFragment : Fragment() {
         return aaChartModel
     }
 
+    /**
+     * Configures the chart series data.
+     */
     @Suppress("UNCHECKED_CAST")
     private fun configureChartSeriesArray(): Array<AASeriesElement> {
         return arrayOf(
@@ -198,6 +229,9 @@ class PlotsFragment : Fragment() {
         )
     }
 
+    /**
+     * Updates the sensors plot based on the API response.
+     */
     private fun updateSensorsPlot(url: String, successListener: (Double, Double, Double) -> Unit, errorListener: (Exception) -> Unit) {
         val requestQueue = Volley.newRequestQueue(context)
         val jsonObjectRequest = JsonObjectRequest(
